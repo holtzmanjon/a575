@@ -1,0 +1,24 @@
+#!/bin/csh
+
+# makes Turbospectrum format linelists from master APOGEE list
+
+  if (-e $1) echo making list using $1
+  else echo usage   turboscript inputfile e.g. turboscript linelist.201009180859
+  endif
+
+  echo ""
+  set file=$1
+  set outfile = `basename $file | sed 's/linelist/turbospec/'`
+  echo outfile = $outfile
+
+   awk '{if (substr($0,1,1) != "#" && substr($0,146,6)*1.0 == 0) printf("%12.5f \n",substr($0,47,8)*1.0)}' $file > mattmp1 
+   awk '{if (substr($0,1,1) != "#" && substr($0,146,6)*1.0 != 0) printf("%12.5f \n",substr($0,47,8)+substr($0,143,3)/100000)}' $file >> mattmp1 
+   sort -n mattmp1 | uniq -c | awk '{printf("%12s%11s\n", $2, $1)}' > mattmp2
+   cp $file mattmp3
+
+   # output all of the lines for each species
+   rm -rf $outfile.atoms
+   awk -f turbo_atom.awk inputfile="mattmp3" mattmp2 > $outfile.atoms
+   rm -rf mattmp2 mattmp3 mattmp1
+
+  if (-e $1) echo output files in : $outfile.atoms and $outfile.molec
