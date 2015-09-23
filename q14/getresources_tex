@@ -1,0 +1,23 @@
+#!/bin/csh
+
+
+echo "\\documentclass{aastex}"
+echo "\\begin{document}"
+
+echo "\\begin{deluxetable}{lclllll}"
+echo "\\rotate"
+echo "\\tabletypesize{\\tiny}"
+echo "\\tablehead{"
+echo "\\colhead{Host}&\\colhead{\# processors}&\\colhead{Processor type}&\\colhead{Speed}&\\colhead{MIPS}& \\colhead{Memory}&\\colhead{Disk}\\\\"
+echo "}"
+echo "\\startdata"
+foreach host ( $* )
+  ssh $host resources_tex
+end
+echo "\\enddata"
+
+echo "\\end{deluxetable}"
+echo "\\end{document}"
+
+
+
