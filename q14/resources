@@ -15,7 +15,7 @@ set mem=`grep MemTotal /proc/meminfo | awk -F: '{print $2}'`
 # only take local disks by selecting ones with dev in the filesystem, ignore /dev/sshm and
 # /boot
 
-if ( output == "html" ) then
+if ( $output == "html" ) then
   # To handle multiple disks for HTML, we'll put the disks in a mini HTML table
   set disk=`df -h | grep dev | grep -v shm | grep -v boot | awk '{printf("<tr><td>%s<td>%s\n",$6, $2)}'`
 
@@ -29,9 +29,7 @@ if ( output == "html" ) then
   echo "<TD>" $mem
   echo "<TD><table border=1>" $disk
   echo "</table>"
-endif
-
-if ( output == "tex" ) then
+else
 
   # To handle multiple disks for LaTeX, we'll put the first disk in the row with the rest of the
   # information, but subsequent disks into their own rows, with empty leading columns
