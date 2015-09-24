@@ -1,0 +1,47 @@
+#!/bin/csh
+
+set output = $1
+shift
+
+if ( $output == "html" ) then 
+  echo "<html><body>" 
+  echo "<table border=2>" 
+  
+  echo "<TR>"
+  echo "<TD> Hostname"
+  echo "<TD> # Processors"
+  echo "<TD> Processors"
+  echo "<TD> Speed"
+  echo "<TD> Bogomips"
+  echo "<TD> Memory"
+  echo "<TD> Disk"
+
+else
+
+  echo "\\documentclass{aastex}"
+  echo "\\begin{document}"
+
+  echo "\\begin{deluxetable}{lclllll}"
+  echo "\\rotate"
+  echo "\\tablecaption{System resources on various NMSU astronomy computers}"
+  echo "\\tabletypesize{\\tiny}"
+  echo "\\tablehead{"
+  echo "\\colhead{Host}&\\colhead{\# processors}&\\colhead{Processor type}&\\colhead{Speed}&\\colhead{MIPS}& \\colhead{Memory}&\\colhead{Disk}\\\\"
+  echo "}"
+  echo "\\startdata"
+
+endif
+
+# loop through all the requested machines, accumulating rows per machines
+foreach host ( $* )
+  ssh $host resources $output
+end
+
+if ( $output == "html") then
+  echo "</table>" 
+  echo "</body></html>"
+else
+  echo "\\enddata"
+  echo "\\end{deluxetable}"
+  echo "\\end{document}"
+endif

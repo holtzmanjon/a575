@@ -1,5 +1,8 @@
 #!/bin/csh
 
+set output = $1
+shift
+
 # get system infor from hostname, /proc/cpuinfo, and /proc/meminfo
 set host = `hostname -s`
 set nproc=`grep processor /proc/cpuinfo | wc -l`
@@ -11,10 +14,34 @@ set mem=`grep MemTotal /proc/meminfo | awk -F: '{print $2}'`
 # disks have a little special handling since there can be multiple disks on a machine
 # only take local disks by selecting ones with dev in the filesystem, ignore /dev/sshm and
 # /boot
-# To handle multiple disks for HTML, we'll put the disks in a mini HTML table
-set disk=`df -h | grep dev | grep -v shm | grep -v boot | awk '{printf("<tr><td>%s<td>%s\n",$6, $2)}'`
-# To handle multiple disks for HTML, we'll put the first disk in the row with the rest of the
-# information, but subsequent disks into their own rows, with empty leading columns
-set disk1=`df -h | grep dev | grep -v shm | grep -v boot | head -1 | awk '{printf("%s %s \n",$6, $2)}'`
-set disks=`df -h | grep dev | grep -v shm | grep -v boot | tail -n +2 | awk '{printf("&&&&&&%s %s \\\\\\\\ \n",$6, $2)}'`
 
+if ( output == "html" ) then
+  # To handle multiple disks for HTML, we'll put the disks in a mini HTML table
+  set disk=`df -h | grep dev | grep -v shm | grep -v boot | awk '{printf("<tr><td>%s<td>%s\n",$6, $2)}'`
+
+  # output a row of an HTML table
+  echo "<TR>"
+  echo "<TD>" $host
+  echo "<TD><center>" $nproc "</center>"
+  echo "<TD>" $proc
+  echo "<TD>" $speed
+  echo "<TD>" $mips
+  echo "<TD>" $mem
+  echo "<TD><table border=1>" $disk
+  echo "</table>"
+endif
+
+if ( output == "tex" ) then
+
+  # To handle multiple disks for LaTeX, we'll put the first disk in the row with the rest of the
+  # information, but subsequent disks into their own rows, with empty leading columns
+  set disk1=`df -h | grep dev | grep -v shm | grep -v boot | head -1 | awk '{printf("%s %s \n",$6, $2)}'`
+  set disks=`df -h | grep dev | grep -v shm | grep -v boot | tail -n +2 | awk '{printf("&&&&&&%s %s \\\\\\\\ \n",$6, $2)}'`
+
+  # output into LaTeX table row
+  # note that disks have to be handled specially for more than one, so that
+  # multiple disks are put on separate table lines
+  echo  "$host & $nproc & $proc & $speed & $mips & $mem & $disk1\\\\"
+  echo "$disks"
+endif
+    
