@@ -6,6 +6,8 @@ set proc=`cat /proc/cpuinfo | grep "model name" | awk -F: '{print $2}' | head -1
 set speed=`cat /proc/cpuinfo | grep MHz | awk -F: '{print $2}' | head -1`
 set mips=`cat /proc/cpuinfo | grep "bogomips" | awk -F: 'NR==1 {print $2}'`
 set mem=`grep MemTotal /proc/meminfo | awk -F: '{print $2}'`
-set disk=`df -h | grep dev | grep -v shm | grep -v boot | awk '{printf("%s %s\\ ",$6, $2)}'`
+set disk1=`df -h | grep dev | grep -v shm | grep -v boot | head -1 | awk '{printf("%s %s ",$6, $2)}'`
+set disks=`df -h | grep dev | grep -v shm | grep -v boot | tail -n +2 | awk '{printf("&&&&&&%s %s\\\\\\\\ \n",$6, $2)}'`
 
-echo  "$host & $nproc & $proc & $speed & $mips & $mem & {$disk}\\\\"
+echo  "$host & $nproc & $proc & $speed & $mips & $mem & $disk1\\\\"
+echo "$disks"
