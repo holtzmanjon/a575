@@ -13,7 +13,7 @@ Usage:
 
 
 Routines:
-   resources {html|tex} {machines}: a tcsh script that will get the system resources and load 
-      them into variables, output in either HTML or LaTex form
+   resources {html|tex} {machines}: a tcsh script that will get the system resources on
+      current machine and load them into variables, output in either HTML or LaTex form
    getresources {html|tex} {machines}:  writes header, runs resources on all machines
       specified as command line arguments, then write trailer

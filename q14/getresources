@@ -1,8 +1,13 @@
 #!/bin/csh
 
+# first argument gives output type
 set output = $1
+
+# shift the first argument off the stack, so that $* refers to remaining arguments, which
+#   are the machine names
 shift
 
+# output header depending on output type
 if ( $output == "html" ) then 
   echo "<html><body>" 
   echo "<table border=2>" 
@@ -37,6 +42,7 @@ foreach host ( $* )
   ssh $host resources $output
 end
 
+# output trailer depending on machine type
 if ( $output == "html") then
   echo "</table>" 
   echo "</body></html>"
