@@ -14,7 +14,7 @@ echo "<TD> Disk"
 
 
 foreach host ( $* )
-  ssh $host resources 
+  ssh $host resources_html
 end
 
 echo "</table>" 

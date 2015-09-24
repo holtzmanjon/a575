@@ -1,12 +1,20 @@
 #!/bin/csh
 
+# get system infor from hostname, /proc/cpuinfo, and /proc/meminfo
 set host = `hostname -s`
 set nproc=`grep processor /proc/cpuinfo | wc -l`
 set proc=`cat /proc/cpuinfo | grep "model name" | awk -F: '{print $2}' | head -1`
 set speed=`cat /proc/cpuinfo | grep MHz | awk -F: '{print $2}' | head -1`
 set mips=`cat /proc/cpuinfo | grep "bogomips" | awk -F: 'NR==1 {print $2}'`
 set mem=`grep MemTotal /proc/meminfo | awk -F: '{print $2}'`
+
+# disks have a little special handling since there can be multiple disks on a machine
+# only take local disks by selecting ones with dev in the filesystem, ignore /dev/sshm and
+# /boot
+# To handle multiple disks for HTML, we'll put the disks in a mini HTML table
 set disk=`df -h | grep dev | grep -v shm | grep -v boot | awk '{printf("<tr><td>%s<td>%s\n",$6, $2)}'`
+# To handle multiple disks for HTML, we'll put the first disk in the row with the rest of the
+# information, but subsequent disks into their own rows, with empty leading columns
 set disk1=`df -h | grep dev | grep -v shm | grep -v boot | head -1 | awk '{printf("%s %s \n",$6, $2)}'`
-set disks=`df -h | grep dev | grep -v shm | grep -v boot | tail -n +2 | awk '{printf("&&&&&%s %s \\\\\\\\ \n",$6, $2)}'`
+set disks=`df -h | grep dev | grep -v shm | grep -v boot | tail -n +2 | awk '{printf("&&&&&&%s %s \\\\\\\\ \n",$6, $2)}'`
 
