@@ -7,13 +7,6 @@ set speed=`cat /proc/cpuinfo | grep MHz | awk -F: '{print $2}' | head -1`
 set mips=`cat /proc/cpuinfo | grep "bogomips" | awk -F: 'NR==1 {print $2}'`
 set mem=`grep MemTotal /proc/meminfo | awk -F: '{print $2}'`
 set disk=`df -h | grep dev | grep -v shm | grep -v boot | awk '{printf("<tr><td>%s<td>%s\n",$6, $2)}'`
+set disk1=`df -h | grep dev | grep -v shm | grep -v boot | head -1 | awk '{printf("%s %s \n",$6, $2)}'`
+set disks=`df -h | grep dev | grep -v shm | grep -v boot | tail -n +2 | awk '{printf("&&&&&%s %s \\\\\\\\ \n",$6, $2)}'`
 
-echo "<TR>"
-echo "<TD>" $host
-echo "<TD><center>" $nproc "</center>"
-echo "<TD>" $proc
-echo "<TD>" $speed
-echo "<TD>" $mips
-echo "<TD>" $mem
-echo "<TD><table border=1>" $disk
-echo "</table>"

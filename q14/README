@@ -1,0 +1,23 @@
+Shell scripts and makefile to get system resources on a list of NMSU 
+astronomy computers, and to output these nicely into both an HTML table
+and into a LaTeX document to be made into a postscript file
+
+Usage:
+   1. edit makefile for desired list of machines in HOST variable at top
+   2. Register your ssh key to allow for ssh logins without password/passphrase
+      prompt: ssh-add, or if you don't have an agent running, ssh-agent tcsh, 
+      then ssh-add
+   3. make without arguments will make both HTML and LaTeX/PDF
+      make html will just make HTML
+      make tex will just make LaTeX/PDF
+
+
+Routines:
+   resources: a tcsh script that will get the system resources and load them
+      into variables
+   resources_html: outputs the variables into HTML format
+   resources_tex: outputs the variable into LaTeX format
+   getresources_html:  writes HTML header, runs resources_html on all machines
+      specified as command line arguments, then write HTML trailer
+   getresources_tex:  writes LaTeX header, runs resources_tex on all machines
+      specified as command line arguments, then write LaTeX trailer

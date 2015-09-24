@@ -1,11 +1,11 @@
 #!/bin/csh
 
-
 echo "\\documentclass{aastex}"
 echo "\\begin{document}"
 
 echo "\\begin{deluxetable}{lclllll}"
 echo "\\rotate"
+echo "\\tablecaption{System resources on various NMSU astronomy computers}"
 echo "\\tabletypesize{\\tiny}"
 echo "\\tablehead{"
 echo "\\colhead{Host}&\\colhead{\# processors}&\\colhead{Processor type}&\\colhead{Speed}&\\colhead{MIPS}& \\colhead{Memory}&\\colhead{Disk}\\\\"
