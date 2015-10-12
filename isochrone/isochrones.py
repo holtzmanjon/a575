@@ -1,7 +1,11 @@
+import os
 import numpy as np
 from astropy.io import ascii
 import pdb
+import astropy
+import math
 
+os.environ['ISOCHRONE_DIR'] = '/home/holtz/analysis/apogee/dist/isochrones/'
 def basicread(infile) :
     """
     Routine to read a Padova isochrone file using low-level I/O and return
@@ -158,7 +162,14 @@ def read(infile,columns=None,age=None) :
         structured array with isochrone data
     """
 
-    data=ascii.read(infile,names=['z','age','mini','mact','logl','logte','logg','mbol','u','b','v','r','i','j','h','k','intimf','stage'])
+    if os.getenv('ISOCHRONE_DIR') != "" :
+        data=ascii.read(os.getenv('ISOCHRONE_DIR')+'/'+infile,
+             names=['z','age','mini','mact','logl','logte','logg',
+                    'mbol','u','b','v','r','i','j','h','k','intimf','stage'])
+    else :
+        data=ascii.read(infile,
+             names=['z','age','mini','mact','logl','logte','logg',
+                    'mbol','u','b','v','r','i','j','h','k','intimf','stage'])
 
     # option to select a certain age
     if age is not None:
@@ -175,3 +186,11 @@ def read(infile,columns=None,age=None) :
         data.keep_columns(columns)
 
     return data
+
+def radius(logl,logte) :
+    """ 
+    Get stellar radius given luminosity, effective temperature
+    """
+    teff=10.**logte * astropy.units.K
+    lum = 10.**logl * astropy.units.Lsun * astropy.constants.L_sun.cgs
+    return np.sqrt(lum / (4.*math.pi*astropy.constants.sigma_sb.cgs*teff**4.))
