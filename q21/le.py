@@ -43,60 +43,62 @@ def rk4(x,y,h,func) :
     k4 = h * func( x+h, y+k3)
     return y + (1./6.)*(k1 + (2.*k2) + (2.*k3) + k4)
 
-ksi = 0.001
-n=1.5
-h = 0.00001
 
-n=3
-ksi = 0.01
-h= 0.01
+def le_solve(xi0=0.001, n=1.5, h=0.001) :
+    """
+    Routine to solve Lane-Emden equation for given polytropic index
 
-y = np.array([ -1.0/3.0 * ksi + n*4.0/120.0 * ksi**3.0 - 6.0*n*(8.0*n-5.0)/15120.0 * ksi**5,
-       1.0 - (ksi**2.0)/6.0 + n/120.0 * ksi**4.0 - n*(8.0*n-5.0)/15120.0 * ksi**6])
+    Args:
 
-ksi_values = ksi
-y_values = np.array(y,ndmin=2)
+    Returns:
+         2 arrays with  z=y' and y=....
+    """
+    xi = xi0
 
-while y[1] >= 0 :
-    y = rk4(ksi,y,h,le_diffeq)
-    ksi_values = np.append(ksi_values,ksi) 
-    y_values = np.append(y_values,[y],axis=0)
-    ksi += h      # increment ksi by the step-size value at each iteration
- 
-theta_n = y_values**n
-theta_np1 = y_values**(n+1.0)
-q=(y[0]*(ksi_values**2.0))
-pdb.set_trace()
-q *= (ksi_values[-1]**2 * y_values[-1,0])**(-1)
+    #set boundary condition
+    y = np.array([ -1.0/3.0 * xi + n*4.0/120.0 * xi**3.0 - 6.0*n*(8.0*n-5.0)/15120.0 * xi**5,
+       1.0 - (xi**2.0)/6.0 + n/120.0 * xi**4.0 - n*(8.0*n-5.0)/15120.0 * xi**6])
 
-M = astropy.constants.M_sun.cgs.value
-R = astropy.constants.R_sun.cgs.value
-G = astropy.constants.G.cgs.value
-k = astropy.constants.k_B.cgs.value
-rho_c = -(M/((4.0*math.pi/3.0)*(R)**3))*(ksi_values[-1]/3.0)*(1.0/y_values[-1,0])
-rho_avg = -3.0/ksi_values[-1]*y_values[-1,0]*rho_c
-N_n = ((4*math.pi)**(1.0/n))/(n+1.) * (-ksi_values[-1]**((n+1.)/(n-1.))*y_values[-1,0])**((1.-n)/n)
-W_n = 1.0/(4*math.pi*(n+1)*(y_values[-1,0])**2)
-P_c = W_n * (G*M**2)/R**4
-O_n = 1.0/(-(n+1)*ksi_values[-1]*y_values[-1,0])
-T_c = (G*M*0.617*1.67e-24/(k*R))*O_n
-print ksi_values[-1],rho_c/rho_avg,W_n,P_c,N_n
-print y_values[-1,0]
-#print ksi_values[-1],rho_c/rho_avg,N_n,W_n,O_n,round(rho_c,3),round(P_c,3),round(T_c,3)
-pdb.set_trace()
+    # initialize arrays to save quantities (really should not be needed! use
+    # xi and y themselves?
+    xi_values = xi
+    y_values = np.array(y,ndmin=2) # 2D array with [Nsteps,2] for two vars
+
+    # integrate until we hit surface
+    while y[1] >= 0 :
+        y = rk4(xi,y,h,le_diffeq)
+        xi_values = np.append(xi_values,xi) 
+        y_values = np.append(y_values,[y],axis=0)
+        xi += h      # increment xi by the step-size value at each iteration
+
+    return xi_values, y_values
+
+def le_values(xi, y) : 
+    """    
+    Routine to calculate various variables given polytropic structure
+
+    Args:
+          xi, y arrays, with y[0]=y', y[1]=y
+    """
+
+    theta_n = y[:,1]**n
+    theta_np1 = y[:,1]**(n+1.0)
+    q=(y[0]*(xi**2.0))
+    pdb.set_trace()
+    q *= (xi[-1]**2 * y[-1,0])**(-1)
+
+    M = astropy.constants.M_sun.cgs.value
+    R = astropy.constants.R_sun.cgs.value
+    G = astropy.constants.G.cgs.value
+    k = astropy.constants.k_B.cgs.value
+    rho_c = -(M/((4.0*math.pi/3.0)*(R)**3))*(xi[-1]/3.0)*(1.0/y[-1,0])
+    rho_avg = -3.0/xi[-1]*y[-1,0]*rho_c
+    N_n = ((4*math.pi)**(1.0/n))/(n+1.) * (-xi[-1]**((n+1.)/(n-1.))*y[-1,0])**((1.-n)/n)
+    W_n = 1.0/(4*math.pi*(n+1)*(y[-1,0])**2)
+    P_c = W_n * (G*M**2)/R**4
+    O_n = 1.0/(-(n+1)*xi[-1]*y[-1,0])
+    T_c = (G*M*0.617*1.67e-24/(k*R))*O_n
+    print xi[-1],rho_c/rho_avg,W_n,P_c,N_n
 
 
-fig1 = plt.figure()
-ax = plt.subplot(111)
-plt.title('Polytrope for n=1.5')
-plt.xlabel('ksi')
-plt.plot(ksi_values,y_values)
-ax.annotate('Theta',xy=(np.median(ksi_values),np.median(y_values)))
-plt.plot(ksi_values,theta_n)
-ax.annotate('Theta^n',xy=(np.median(ksi_values),np.median(theta_n)))
-plt.plot(ksi_values,theta_np1)
-ax.annotate('Theta^n+1',xy=(np.median(ksi_values),np.median(theta_np1)))
-plt.plot(ksi_values,q)
-ax.annotate('q',xy=(np.median(ksi_values),np.median(q)))
-
-plt.show()
+#def le_plot(xi, y, erase=True,....) :
