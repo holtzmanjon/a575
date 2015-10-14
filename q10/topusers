@@ -1,0 +1,3 @@
+#!/bin/csh
+
+du -s /home/hyades/* | sort -n -r | head -10
