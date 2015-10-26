@@ -1,0 +1,44 @@
+<HTML>
+<BODY>
+
+
+The basic idea was to caculate the the integral of the function<br>
+y = x^3 + x^{2/3}<br>
+This was done both numerically as well as analytically.
+<p>
+For the numerical integration, Simpson's rule was used:<br>
+\int_a^b f(x) dx \approx {(b-a)\over 6} \left(y(a) + 4 y((a+b)/2) + y(b)\right)
+<p>
+For the analytical integration, the result is given by:<br>
+
+\int_a^b f(x) dx = x^4/4 + 3/5 x^{5/3} |_a^b
+<p>
+The integral was computed between 0 and 10. The numerical integration was
+about 0.02\% off from the analytical one.
+<p>
+I then proceded to split the Simpson's integration up into multiple steps, 
+and calculated the fractional error as a function of the number of pieces.
+The results are shown in the following figure:<br>
+
+<img src=../q3/simp.jpg>
+
+<p>
+The following table shows the fractional error as a function of the number
+of pieces:<br>
+
+<TABLE BORDER=2>
+<TR><TD> Number of pieces <TD> Fractional error
+<TR><TD> 1 <TD> -0.000245307331841
+<TR><TD> 2 <TD> -7.7656140706e-05
+<TR><TD> 3 <TD> -3.95427362471e-05
+<TR><TD> 4 <TD> -2.44881707436e-05
+<TR><TD> 5 <TD> -1.68846338361e-05
+<TR><TD> 6 <TD> -1.24609013845e-05
+<TR><TD> 7 <TD> -9.63799435511e-06
+<TR><TD> 8 <TD> -7.71512276632e-06
+<TR><TD> 9 <TD> -6.34008146724e-06
+<TR><TD> 10 <TD> -5.31908134828e-06
+</table>
+
+</body>
+</html>
