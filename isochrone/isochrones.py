@@ -195,7 +195,7 @@ def radius(logl,logte) :
     lum = 10.**logl * astropy.units.Lsun * astropy.constants.L_sun.cgs
     return np.sqrt(lum / (4.*math.pi*astropy.constants.sigma_sb.cgs*teff**4.))
 
-def mkhess(age, file='zp00.dat', xval='logte',yval='logl',xr=[3.0,4.0],yr=[-6.,5],nbins=200) :
+def mkhess(age=None, file='zp00.dat', xval='logte',yval='logl',xr=[3.4,4.5],yr=[-6.,5],nbins=200) :
     """
     Routine to make a Hess diagram of a particular age from a file
     """
@@ -207,33 +207,41 @@ def mkhess(age, file='zp00.dat', xval='logte',yval='logl',xr=[3.0,4.0],yr=[-6.,5
     dx=(xr[1]-xr[0])/nbins
     dy=(yr[1]-yr[0])/nbins
 
-    # calculate bin locations
-    xbin = ((iso[xval]-xr[0])/dx).astype('int')
-    ybin = ((iso[yval]-yr[0])/dy).astype('int')
+    # need to handle each age separately
+    ages = set(iso['age'])
+    for age in ages :
+        print 'load age: ', age
+        gd = np.where(iso['age'] == age)
+        print gd
+        aiso = iso[gd]
 
-    # loop over each pair of isochrone points
-    for i in range(len(xbin)-1) :
-        # number of stars in between these points
-        nimf = iso['intimf'][i+1]-iso['intimf'][i]
+        # calculate bin locations
+        xbin = ((aiso[xval]-xr[0])/dx).astype('int')
+        ybin = ((aiso[yval]-yr[0])/dy).astype('int')
 
-        # get min and max bin numbers
-        xmin= np.min(xbin[i:i+2])
-        xmax= np.max(xbin[i:i+2])
-        ymin= np.min(ybin[i:i+2])
-        ymax= np.max(ybin[i:i+2])
+        # loop over each pair of isochrone points
+        for i in range(len(xbin)-1) :
+            # number of stars in between these points
+            nimf = aiso['intimf'][i+1]-aiso['intimf'][i]
+    
+            # get min and max bin numbers
+            xmin= np.min(xbin[i:i+2])
+            xmax= np.max(xbin[i:i+2])
+            ymin= np.min(ybin[i:i+2])
+            ymax= np.max(ybin[i:i+2])
 
-        # make sure that bin range is within the output Hess diagram
-        if ymax > 0 and xmax > 0 and ymin < nbins-1 and xmin < nbins-1 :
-            # number of bins over which stars are spread
-            nbin = (xmax-xmin+1)*(ymax-ymin+1)
+            # make sure that bin range is within the output Hess diagram
+            if ymax > 0 and xmax > 0 and ymin < nbins-1 and xmin < nbins-1 :
+                # number of bins over which stars are spread
+                nbin = (xmax-xmin+1)*(ymax-ymin+1)
 
-            # make sure we don't go over the edge of the Hess diagram
-            xmin= np.max([xmin,0])
-            xmax= np.min([xmax,nbins-1])
-            ymin= np.max([ymin,0])
-            ymax= np.min([ymax,nbins-1])
+                # make sure we don't go over the edge of the Hess diagram
+                xmin= np.max([xmin,0])
+                xmax= np.min([xmax,nbins-1])
+                ymin= np.max([ymin,0])
+                ymax= np.min([ymax,nbins-1])
  
-            # add the stars in!
-            hess[ymin:ymax+1,xmin:xmax+1] += nimf / nbin
+                # add the stars in!
+                hess[ymin:ymax+1,xmin:xmax+1] += nimf / nbin
 
     return hess
